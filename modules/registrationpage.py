@@ -1,5 +1,19 @@
 from selene import browser, have, command
 import os.path
+from modules.user_data import User
+
+user = User(name='Sergei',
+            lastname='Chu',
+            email='ncrs@test.test',
+            gender='Male',
+            phone='1234567890',
+            birthday=['06', 'October', '1983'],
+            subjects='English',
+            hobby='Reading',
+            picture='bar-h.png',
+            address='SPB',
+            state='Haryana',
+            city='Karnal')
 
 
 class RegistrationPage:
@@ -11,65 +25,45 @@ class RegistrationPage:
         )
         browser.all('[id^=google_ads]').perform(command.js.remove)
 
-    def fill_first_name(self, name):
-        browser.element('#firstName').type(name)
-
-    def fill_last_name(self, lastname):
-        browser.element('#lastName').type(lastname)
-
-    def fill_email(self, email):
-        browser.element('#userEmail').type(email)
-
-    def choice_gender(self, gender):
-        browser.all('[name=gender]').element_by(have.value(gender)).element('..').click()
-
-    def fill_phone_number(self, number):
-        browser.element('#userNumber').type(number)
-
-    def fill_address(self, address):
-        browser.element('#currentAddress').type(address)
-
-    def fill_birthday(self, month, year, day):
+    def fill_form(self):
+        browser.element('#firstName').type(user.name)
+        browser.element('#lastName').type(user.lastname)
+        browser.element('#userEmail').type(user.email)
+        browser.all('[name=gender]').element_by(have.value(user.gender)).element('..').click()
+        browser.element('#userNumber').type(user.phone)
+        browser.element('#currentAddress').type(user.address)
         browser.element('#dateOfBirthInput').click()
         browser.element('.react-datepicker__month-dropdown-container').click()
         browser.all('.react-datepicker__month-dropdown-container select option').element_by(
-            have.exact_text(month)).click()
+            have.exact_text(user.birthday[1])).click()
         browser.element('.react-datepicker__year-dropdown-container').click()
         browser.all('.react-datepicker__year-select option').element_by(
-            have.exact_text(year)).click()
-        browser.all(f'.react-datepicker__day--0{day}').first.click()
+            have.exact_text(user.birthday[2])).click()
+        browser.all(f'.react-datepicker__day--0{user.birthday[0]}').first.click()
 
-        browser.element('#dateOfBirthInput').should(have.value('06 Oct 1983'))
-
-    def fill_subjects(self, subjects):
         browser.element('#subjectsInput').type('En')
-        browser.element('#react-select-2-option-0').should(have.exact_text(subjects)).click()
+        browser.element('#react-select-2-option-0').should(have.exact_text(user.subjects)).click()
+        browser.all('.custom-checkbox').element_by(have.exact_text(user.hobby)).perform(
+            command.js.scroll_into_view).click()
 
-    def fill_hobbies(self, hobby):
-        (browser.all('.custom-checkbox').
-         element_by(have.exact_text(hobby)).
-         perform(command.js.scroll_into_view).click())
+        browser.element('#uploadPicture').send_keys(os.path.abspath(f'./resources/{user.picture}'))
 
-    def picture_upload(self, picture):
-        browser.element('#uploadPicture').send_keys(os.path.abspath(f'./resources/{picture}'))
+        browser.element('#state').click().element('#react-select-3-option-2').should(
+            have.exact_text(user.state)).click()
 
-    def fill_state(self, state):
-        browser.element('#state').click().element('#react-select-3-option-2').should(have.exact_text(state)).click()
-
-    def fill_city(self, city):
-        browser.element('#city').click().element('#react-select-4-option-0').should(have.exact_text(city)).click()
+        browser.element('#city').click().element('#react-select-4-option-0').should(have.exact_text(user.city)).click()
         browser.element('#submit').press_enter()
 
-    def assert_form(self, name, lastname, email, gender, phone,
-                    birthday, subjects, hobby, picture, address, state, city):
+    def assert_form(self):
         browser.element('.table').all('td').even.should(have.exact_texts(
-            ' '.join([name, lastname]),
-            email,
-            gender,
-            phone,
-            birthday,
-            subjects,
-            hobby,
-            picture,
-            address,
-            ' '.join([state, city])))
+            ' '.join([user.name, user.lastname]),
+            user.email,
+            user.gender,
+            user.phone,
+            f"{user.birthday[0]} {user.birthday[1]},{user.birthday[2]}",
+            user.subjects,
+            user.hobby,
+            user.picture,
+            user.address,
+            ' '.join([user.state, user.city])))
+
