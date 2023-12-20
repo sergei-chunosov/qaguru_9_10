@@ -51,7 +51,8 @@ class RegistrationPage:
          perform(command.js.scroll_into_view).click())
 
     def picture_upload(self, picture):
-        browser.element('#uploadPicture').send_keys(os.path.abspath(f'./resources/{picture}'))
+        picture_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'resources', picture)
+        browser.element('#uploadPicture').send_keys(os.path.abspath(picture_path))
 
     def fill_state(self, state):
         browser.element('#state').click().element('#react-select-3-option-2').should(have.exact_text(state)).click()
