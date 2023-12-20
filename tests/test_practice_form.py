@@ -1,4 +1,4 @@
-from modules.registrationpage import RegistrationPage
+from pages.registration_page import RegistrationPage
 
 
 def test_add_form():

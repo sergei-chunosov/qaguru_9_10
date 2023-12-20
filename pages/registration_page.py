@@ -1,19 +1,6 @@
 from selene import browser, have, command
 import os.path
-from modules.user_data import User
-
-user = User(name='Sergei',
-            lastname='Chu',
-            email='ncrs@test.test',
-            gender='Male',
-            phone='1234567890',
-            birthday=['06', 'October', '1983'],
-            subjects='English',
-            hobby='Reading',
-            picture='bar-h.png',
-            address='SPB',
-            state='Haryana',
-            city='Karnal')
+from data.user_data import *
 
 
 class RegistrationPage:
@@ -46,7 +33,8 @@ class RegistrationPage:
         browser.all('.custom-checkbox').element_by(have.exact_text(user.hobby)).perform(
             command.js.scroll_into_view).click()
 
-        browser.element('#uploadPicture').send_keys(os.path.abspath(f'./resources/{user.picture}'))
+        picture_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'resources', user.picture)
+        browser.element('#uploadPicture').send_keys(os.path.abspath(picture_path))
 
         browser.element('#state').click().element('#react-select-3-option-2').should(
             have.exact_text(user.state)).click()
@@ -66,4 +54,3 @@ class RegistrationPage:
             user.picture,
             user.address,
             ' '.join([user.state, user.city])))
-
