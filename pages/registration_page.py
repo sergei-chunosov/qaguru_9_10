@@ -1,5 +1,5 @@
 from selene import browser, have, command
-import os.path
+import os
 
 
 class RegistrationPage:
