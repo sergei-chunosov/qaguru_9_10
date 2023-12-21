@@ -1,6 +1,7 @@
 from selene import browser, have, command
-import os.path
-from data.user_data import *
+import os
+
+from data.user_data import User
 
 
 class RegistrationPage:
@@ -12,7 +13,7 @@ class RegistrationPage:
         )
         browser.all('[id^=google_ads]').perform(command.js.remove)
 
-    def fill_form(self):
+    def fill_form(self, user: User):
         browser.element('#firstName').type(user.name)
         browser.element('#lastName').type(user.lastname)
         browser.element('#userEmail').type(user.email)
@@ -42,7 +43,7 @@ class RegistrationPage:
         browser.element('#city').click().element('#react-select-4-option-0').should(have.exact_text(user.city)).click()
         browser.element('#submit').press_enter()
 
-    def assert_form(self):
+    def assert_form(self, user: User):
         browser.element('.table').all('td').even.should(have.exact_texts(
             ' '.join([user.name, user.lastname]),
             user.email,
